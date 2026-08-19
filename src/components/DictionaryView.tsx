@@ -130,16 +130,35 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder={`Cari kosakata... (e.g. Makan, Manre, Selamat)`}
-              className="w-full pl-11 pr-10 py-3 bg-slate-100 border-none outline-none text-slate-800 text-sm rounded-full font-medium"
+              onKeyDown={e => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  handleAITranslate();
+                }
+              }}
+              placeholder={`Cari atau terjemahkan kata/kalimat ke ${targetLang.name}... (Tekan Enter)`}
+              className="w-full pl-11 pr-24 py-3 bg-slate-100 border-none outline-none text-slate-800 text-sm rounded-full font-medium"
             />
             {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 font-bold text-sm p-1 cursor-pointer"
-              >
-                ✕
-              </button>
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <button
+                  onClick={handleAITranslate}
+                  disabled={aiLoading}
+                  className="px-2.5 py-1 bg-green-700 hover:bg-green-800 text-white text-xs font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50"
+                  title="Terjemahkan"
+                >
+                  {aiLoading ? '...' : 'Translate'}
+                </button>
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setAiResult(null);
+                    setAiError(null);
+                  }}
+                  className="text-slate-400 hover:text-slate-600 font-bold text-sm p-1 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
             )}
           </div>
 
@@ -194,17 +213,17 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
 
       {/* AI Search Banner fallback if query exists and no results or user wants AI */}
       {searchQuery.trim() !== '' && (
-        <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-emerald-950 p-4 sm:p-5 rounded-2xl text-white border border-emerald-700/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
+        <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="p-2.5 bg-amber-400 text-slate-950 rounded-xl font-bold shrink-0 mt-0.5">
-              <Sparkles className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-green-50 border border-green-200 text-green-800 flex items-center justify-center font-bold shrink-0">
+              <Sparkles className="w-5 h-5 text-amber-500" />
             </div>
             <div>
-              <h4 className="font-bold text-amber-300 text-sm sm:text-base">
-                Mencari "{searchQuery}" dengan AI Leksika Nusantara
+              <h4 className="font-extrabold text-slate-900 text-sm sm:text-base">
+                Terjemahkan "{searchQuery}" dengan AI Leksika
               </h4>
-              <p className="text-xs text-emerald-100/90 mt-0.5">
-                Gunakan AI untuk terjemahan kontekstual, cara membaca, dan contoh kalimat {targetLang.name} secara instan.
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                Dapatkan terjemahan instan, pelafalan fonetis, dan contoh kalimat ke {targetLang.name}.
               </p>
             </div>
           </div>
@@ -212,17 +231,17 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
           <button
             onClick={handleAITranslate}
             disabled={aiLoading}
-            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-2 shadow-sm shrink-0 disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2.5 bg-green-700 hover:bg-green-800 text-white font-bold text-xs sm:text-sm rounded-full flex items-center gap-2 shadow-xs shrink-0 disabled:opacity-50 cursor-pointer"
           >
             {aiLoading ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Memproses AI...</span>
+                <span>Menerjemahkan...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4" />
-                <span>Terjemahkan dengan AI</span>
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Terjemahkan Sekarang</span>
               </>
             )}
           </button>
@@ -231,41 +250,42 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
 
       {/* AI Error Alert */}
       {aiError && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm rounded-xl">
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm rounded-2xl">
           {aiError}
         </div>
       )}
 
       {/* AI Translation Result Card */}
       {aiResult && (
-        <div className="bg-gradient-to-br from-amber-50 to-emerald-50 border-2 border-amber-300 p-5 rounded-2xl shadow-md space-y-3">
+        <div className="bg-white border-2 border-green-600/30 p-5 sm:p-6 rounded-3xl shadow-sm space-y-4 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="px-3 py-1 bg-amber-500 text-slate-950 text-xs font-black rounded-full uppercase tracking-wider flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Hasil Terjemahan AI
+            <span className="px-3 py-1 bg-green-50 text-green-800 border border-green-200 text-xs font-bold rounded-full uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Hasil Terjemahan AI
             </span>
-            <span className="text-xs font-bold text-slate-600">{targetLang.name}</span>
+            <span className="text-xs font-extrabold text-slate-600">{targetLang.name}</span>
           </div>
 
-          <div className="flex items-baseline justify-between">
+          <div className="flex items-baseline justify-between gap-4">
             <div>
-              <h3 className="text-2xl font-black text-slate-900">{aiResult.translation}</h3>
-              <p className="text-xs text-slate-500 font-mono mt-0.5">
-                Cara Membaca: <span className="text-emerald-800 font-bold">"{aiResult.phonetic}"</span>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900">{aiResult.translation}</h3>
+              <p className="text-xs text-slate-500 font-mono mt-1">
+                Cara Membaca: <span className="text-green-800 font-bold">"{aiResult.phonetic}"</span>
               </p>
             </div>
 
             <button
               onClick={e => handleAudioPlay(e, aiResult)}
-              className="p-3 bg-emerald-700 text-white hover:bg-emerald-800 rounded-full shadow-md transition-all"
+              className="p-3 bg-green-700 text-white hover:bg-green-800 rounded-2xl shadow-xs transition-all cursor-pointer shrink-0"
+              title="Dengarkan Suara"
             >
               <Volume2 className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="p-3 bg-white/80 rounded-xl text-xs space-y-1 border border-amber-200/60">
-            <p className="font-bold text-slate-800">Arti Bahasa Indonesia: {aiResult.word}</p>
+          <div className="p-4 bg-slate-50 rounded-2xl text-xs space-y-1.5 border border-slate-200">
+            <p className="font-bold text-slate-800">Arti ({sourceLang.name}): {aiResult.word}</p>
             {aiResult.exampleSentence && (
-              <p className="text-emerald-900 italic font-medium mt-1">"{aiResult.exampleSentence}"</p>
+              <p className="text-green-900 italic font-medium mt-1">"{aiResult.exampleSentence}"</p>
             )}
             {aiResult.exampleTranslation && (
               <p className="text-slate-600">{aiResult.exampleTranslation}</p>
@@ -273,17 +293,17 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
           </div>
 
           {aiResult.culturalContext && (
-            <p className="text-xs text-slate-700 bg-amber-100/70 p-2.5 rounded-lg border border-amber-200">
-              <span className="font-bold">Wawasan Budaya:</span> {aiResult.culturalContext}
-            </p>
+            <div className="text-xs text-slate-700 bg-amber-50/80 p-3 rounded-2xl border border-amber-200/80">
+              <span className="font-bold text-amber-900">Wawasan Budaya & Konteks:</span> {aiResult.culturalContext}
+            </div>
           )}
 
           <div className="flex justify-end pt-1">
             <button
               onClick={() => onSelectWordDetail(aiResult)}
-              className="text-xs font-bold text-emerald-800 hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-green-800 hover:text-green-900 flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Lihat Detail & Simpan</span>
+              <span>Buka Detail Lengkap & Simpan</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { DictionaryView } from './components/DictionaryView';
+import { TranslatorView } from './components/TranslatorView';
 import { LearnHub } from './components/LearnHub';
 import { QuizView } from './components/QuizView';
 import { AITutorChat } from './components/AITutorChat';
@@ -22,7 +23,7 @@ import {
 
 export default function App() {
   // Navigation State
-  const [activeTab, setActiveTab] = useState<'dictionary' | 'learn' | 'quiz' | 'ai' | 'profile'>('dictionary');
+  const [activeTab, setActiveTab] = useState<'dictionary' | 'translate' | 'learn' | 'quiz' | 'ai' | 'profile'>('dictionary');
 
   // Languages State (Default: Indonesia -> Bugis)
   const [sourceLang, setSourceLang] = useState<Language>(
@@ -146,6 +147,21 @@ export default function App() {
             onToggleBookmark={handleToggleBookmark}
             onSelectWordDetail={handleSelectWordDetail}
             onOpenLanguageModal={type => setLanguageModalType(type)}
+          />
+        )}
+
+        {activeTab === 'translate' && (
+          <TranslatorView
+            sourceLang={sourceLang}
+            targetLang={targetLang}
+            onSelectLanguage={(type, lang) => {
+              if (type === 'source') setSourceLang(lang);
+              else setTargetLang(lang);
+            }}
+            onSwapLanguages={handleSwapLanguages}
+            bookmarks={userProfile.bookmarks}
+            onToggleBookmark={handleToggleBookmark}
+            onSelectWordDetail={handleSelectWordDetail}
           />
         )}
 

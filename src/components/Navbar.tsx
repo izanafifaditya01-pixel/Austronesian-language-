@@ -3,8 +3,8 @@ import { BookMarked, BrainCircuit, Sparkles, User, Award, Flame, Languages, Sear
 import { UserProfile } from '../types';
 
 interface NavbarProps {
-  activeTab: 'dictionary' | 'learn' | 'quiz' | 'ai' | 'profile';
-  setActiveTab: (tab: 'dictionary' | 'learn' | 'quiz' | 'ai' | 'profile') => void;
+  activeTab: 'dictionary' | 'translate' | 'learn' | 'quiz' | 'ai' | 'profile';
+  setActiveTab: (tab: 'dictionary' | 'translate' | 'learn' | 'quiz' | 'ai' | 'profile') => void;
   userProfile: UserProfile;
 }
 
@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, userPro
             <button
               id="nav-tab-dictionary"
               onClick={() => setActiveTab('dictionary')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'dictionary'
                   ? 'bg-green-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
@@ -52,35 +52,48 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, userPro
             </button>
 
             <button
+              id="nav-tab-translate"
+              onClick={() => setActiveTab('translate')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                activeTab === 'translate'
+                  ? 'bg-green-700 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
+            >
+              <Languages className="w-4 h-4 text-amber-300" />
+              <span>Penerjemah</span>
+            </button>
+
+            <button
               id="nav-tab-learn"
               onClick={() => setActiveTab('learn')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'learn'
                   ? 'bg-green-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              <span>Belajar Kosakata</span>
+              <span>Belajar</span>
             </button>
 
             <button
               id="nav-tab-quiz"
               onClick={() => setActiveTab('quiz')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'quiz'
                   ? 'bg-green-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <BrainCircuit className="w-4 h-4" />
-              <span>Kuis Interaktif</span>
+              <span>Kuis</span>
             </button>
 
             <button
               id="nav-tab-ai"
               onClick={() => setActiveTab('ai')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'ai'
                   ? 'bg-green-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
@@ -132,54 +145,64 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, userPro
 
       {/* Mobile Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-50 px-2 py-1.5 shadow-lg">
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-6 gap-1">
           <button
             onClick={() => setActiveTab('dictionary')}
-            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[11px] font-medium ${
-              activeTab === 'dictionary' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-medium ${
+              activeTab === 'dictionary' ? 'text-green-700 font-bold' : 'text-slate-500'
             }`}
           >
-            <Search className="w-5 h-5 mb-0.5" />
+            <Search className="w-4 h-4 mb-0.5" />
             <span>Kamus</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('learn')}
-            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[11px] font-medium ${
-              activeTab === 'learn' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+            onClick={() => setActiveTab('translate')}
+            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-medium ${
+              activeTab === 'translate' ? 'text-green-700 font-bold' : 'text-slate-500'
             }`}
           >
-            <BookOpen className="w-5 h-5 mb-0.5" />
+            <Languages className="w-4 h-4 mb-0.5" />
+            <span>Terjemah</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('learn')}
+            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-medium ${
+              activeTab === 'learn' ? 'text-green-700 font-bold' : 'text-slate-500'
+            }`}
+          >
+            <BookOpen className="w-4 h-4 mb-0.5" />
             <span>Belajar</span>
           </button>
 
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[11px] font-medium ${
-              activeTab === 'quiz' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-medium ${
+              activeTab === 'quiz' ? 'text-green-700 font-bold' : 'text-slate-500'
             }`}
           >
-            <BrainCircuit className="w-5 h-5 mb-0.5" />
+            <BrainCircuit className="w-4 h-4 mb-0.5" />
             <span>Kuis</span>
           </button>
 
           <button
             onClick={() => setActiveTab('ai')}
-            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[11px] font-medium ${
-              activeTab === 'ai' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-medium ${
+              activeTab === 'ai' ? 'text-green-700 font-bold' : 'text-slate-500'
             }`}
           >
-            <Sparkles className="w-5 h-5 mb-0.5 text-amber-500" />
+            <Sparkles className="w-4 h-4 mb-0.5 text-amber-500" />
             <span>AI Tutor</span>
           </button>
 
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[11px] font-medium ${
-              activeTab === 'profile' ? 'text-emerald-700 font-bold' : 'text-slate-500'
+            className={`flex flex-col items-center justify-center py-1.5 rounded-lg text-[10px] font-medium ${
+              activeTab === 'profile' ? 'text-green-700 font-bold' : 'text-slate-500'
             }`}
           >
-            <User className="w-5 h-5 mb-0.5" />
+            <User className="w-4 h-4 mb-0.5" />
             <span>Profil</span>
           </button>
         </div>

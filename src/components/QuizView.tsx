@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { BrainCircuit, Sparkles, CheckCircle2, XCircle, RotateCcw, Trophy, Award, Zap, HelpCircle, Volume2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BrainCircuit, Sparkles, CheckCircle2, XCircle, RotateCcw, Trophy, Award, Zap, HelpCircle, Volume2, Shuffle, Languages } from 'lucide-react';
 import { QuizQuestion, Language } from '../types';
-import { QUIZ_DATABASE } from '../data/quizDatabase';
+import { generateRandomQuiz } from '../utils/quizGenerator';
 import { speakWord } from '../utils/audioSpeech';
+import { LANGUAGES_DATA } from '../data/languagesData';
 
 interface QuizViewProps {
   targetLang: Language;
@@ -11,6 +12,8 @@ interface QuizViewProps {
 
 export const QuizView: React.FC<QuizViewProps> = ({ targetLang, onAddXp }) => {
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
+  const [selectedLanguageScope, setSelectedLanguageScope] = useState<string>(targetLang.id);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [scrambleLettersInput, setScrambleLettersInput] = useState<string[]>([]);
@@ -20,8 +23,23 @@ export const QuizView: React.FC<QuizViewProps> = ({ targetLang, onAddXp }) => {
   const [quizFinished, setQuizFinished] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
-  // Questions for chosen difficulty
-  const questions = QUIZ_DATABASE.filter(q => q.difficulty === difficulty);
+  // Initialize randomized questions on difficulty or language scope change
+  useEffect(() => {
+    loadFreshRandomQuiz(difficulty, selectedLanguageScope);
+  }, [difficulty, selectedLanguageScope]);
+
+  const loadFreshRandomQuiz = (diff: 'easy' | 'medium' | 'hard', langId: string) => {
+    const randomSet = generateRandomQuiz(diff, langId, 6);
+    setQuestions(randomSet);
+    setCurrentQuestionIdx(0);
+    setScore(0);
+    setIsSubmitted(false);
+    setIsCorrect(null);
+    setSelectedOption(null);
+    setScrambleLettersInput([]);
+    setQuizFinished(false);
+  };
+
   const currentQ = questions[currentQuestionIdx];
 
   const handleSelectOption = (option: string) => {
@@ -76,13 +94,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ targetLang, onAddXp }) => {
   };
 
   const handleRestartQuiz = () => {
-    setCurrentQuestionIdx(0);
-    setScore(0);
-    setIsSubmitted(false);
-    setIsCorrect(null);
-    setSelectedOption(null);
-    setScrambleLettersInput([]);
-    setQuizFinished(false);
+    loadFreshRandomQuiz(difficulty, selectedLanguageScope);
   };
 
   return (
@@ -106,25 +118,50 @@ export const QuizView: React.FC<QuizViewProps> = ({ targetLang, onAddXp }) => {
           Uji pemahaman kosakata, susun huruf kata daerah, dan isi kata yang kosong untuk menaikkan level & meraih badge prestasi.
         </p>
 
-        {/* Difficulty Selector */}
-        <div className="flex items-center gap-2 pt-2">
-          <span className="text-xs font-bold text-slate-700 mr-1">Tingkat Kesulitan:</span>
-          {(['easy', 'medium', 'hard'] as const).map(level => (
-            <button
-              key={level}
-              onClick={() => {
-                setDifficulty(level);
-                handleRestartQuiz();
-              }}
-              className={`px-3.5 py-1.5 rounded-2xl text-xs font-bold capitalize transition-all cursor-pointer ${
-                difficulty === level
-                  ? 'pill-active shadow-xs'
-                  : 'pill-inactive border border-slate-200 hover:bg-slate-200/80'
-              }`}
+        {/* Controls: Difficulty & Language Scope & Shuffle */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-slate-700 mr-1">Tingkat Kesulitan:</span>
+            {(['easy', 'medium', 'hard'] as const).map(level => (
+              <button
+                key={level}
+                onClick={() => {
+                  setDifficulty(level);
+                }}
+                className={`px-3.5 py-1.5 rounded-2xl text-xs font-bold capitalize transition-all cursor-pointer ${
+                  difficulty === level
+                    ? 'pill-active shadow-xs'
+                    : 'pill-inactive border border-slate-200 hover:bg-slate-200/80'
+                }`}
+              >
+                {level === 'easy' ? 'Mudah' : level === 'medium' ? 'Sedang' : 'Sulit'}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedLanguageScope}
+              onChange={e => setSelectedLanguageScope(e.target.value)}
+              className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none cursor-pointer"
             >
-              {level === 'easy' ? 'Mudah' : level === 'medium' ? 'Sedang' : 'Sulit'}
+              <option value="all">🌏 Semua Bahasa Nusantara</option>
+              {LANGUAGES_DATA.filter(l => l.id !== 'ind').map(lang => (
+                <option key={lang.id} value={lang.id}>
+                  {lang.flagEmoji} {lang.name}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={handleRestartQuiz}
+              className="px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 text-green-800 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="Acak pertanyaan kuis baru"
+            >
+              <Shuffle className="w-3.5 h-3.5" />
+              <span>Acak Soal Baru</span>
             </button>
-          ))}
+          </div>
         </div>
       </div>
 
